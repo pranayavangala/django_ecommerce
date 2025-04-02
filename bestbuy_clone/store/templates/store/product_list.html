@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Product List</title>
+</head>
+<body>
+    <h1>Product List</h1>
+    <h2>Filter by Category</h2>
+<ul>
+    <li><a href="{% url 'product_list' %}">All</a></li>
+    {% for category in categories %}
+        <li><a href="?category={{ category.slug }}">{{ category.name }}</a></li>
+    {% endfor %}
+</ul>
+
+    <h2>Products</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+                <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a> - ${{ product.price }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Best Buy Clone</title>
+  {% load static %}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const menuBtn = document.getElementById("menu-btn");
+      const dropdownMenu = document.getElementById("dropdown-menu");
+
+      menuBtn.addEventListener("click", function () {
+        dropdownMenu.classList.toggle("hidden");
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!menuBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
+          dropdownMenu.classList.add("hidden");
+        }
+      });
+    });
+  </script>
+</head>
+
+<body class="bg-gray-100">
+
+  <!-- Navigation Bar -->
+  <nav class="bg-blue-900 p-4 text-white flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <div class="text-2xl font-bold">Best Buy</div>
+      <div class="relative">
+        <button id="menu-btn" class="px-4 py-2 bg-white text-blue-900 rounded-md">Menu</button>
+        <div id="dropdown-menu" class="absolute hidden bg-white text-black w-48 mt-2 rounded-lg shadow-lg">
+          <a href="#" class="block px-4 py-2 hover:bg-gray-200">Deals</a>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-200">Support & Services</a>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-200">Brands</a>
+          <hr />
+          <a href="#" class="block px-4 py-2 hover:bg-gray-200">Appliances</a>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-200">TV & Home Theater</a>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-200">Computers & Tablets</a>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-200">Cell Phones</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <form action="{% url 'search_results' %}" method="GET" class="w-1/3 flex">
+      <input type="text" name="q" placeholder="Search for products..." class="px-4 py-2 rounded-l-lg text-black w-full" required />
+      <button type="submit" class="bg-yellow-400 px-4 py-2 rounded-r-lg text-black">🔍</button>
+    </form>
+
+    <!-- Account & Cart Links -->
+    <div class="space-x-4">
+      <a href="{% url 'account' %}" class="hover:underline">Account</a>
+      <a href="{% url 'cart' %}" class="hover:underline">Cart</a>
+      <a href="{% url 'logout' %}" class="hover:underline">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Header Banner -->
+  <header class="bg-blue-600 text-white p-6 text-center text-2xl font-semibold">
+    Samsung Vision AI ✨ is here - Save on 2025 TVs and audio
+  </header>
+
+  <!-- Main Product Section -->
+  <main class="container mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
+    <!-- Product Card -->
+    <div class="bg-white p-4 rounded-lg shadow text-center">
+      <img
+        src="https://product999.s3.us-east-1.amazonaws.com/flowers1/0001.png"
+        alt="MSI - NVIDIA GeForce RTX 5070"
+        onclick="openModal(this.src)"
+        class="rounded cursor-pointer mx-auto hover:scale-105 transition-transform duration-200"
+        width="200"
+      />
+      <h2 class="text-lg font-semibold mt-2">MSI - NVIDIA GeForce RTX 5070</h2>
+      <p class="text-gray-600">$699.99</p>
+
+      <form action="{% url 'add_to_cart' %}" method="POST" class="mt-2">
+        {% csrf_token %}
+        <input type="hidden" name="product_name" value="MSI - NVIDIA GeForce RTX 5070">
+        <input type="hidden" name="product_price" value="699.99">
+        <input type="hidden" name="product_image" value="https://product999.s3.us-east-1.amazonaws.com/flowers1/0001.png">
+        <input type="hidden" name="product_description" value="RTX 5070 GPU card, high-end performance">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">
+          Add to Cart
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Image Modal -->
+ <!-- Fullscreen Product Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50 p-6 overflow-auto">
+  <div class="bg-white rounded-lg shadow-lg max-w-6xl w-full flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Left: Large Image -->
+    <div class="md:w-2/3 w-full flex items-center justify-center p-6 bg-gray-100">
+      <img id="modalImage" src="" alt="Product"
+           class="rounded shadow-lg max-w-full max-h-[90vh] object-contain"
+           onload="showImageSize(this)">
+    </div>
+
+    <!-- Right: Product Info -->
+    <div class="md:w-1/3 w-full p-6 flex flex-col justify-between">
+      <div>
+        <h2 id="modalTitle" class="text-2xl font-bold text-gray-900 mb-2">Product Title</h2>
+        <p id="modalDescription" class="text-gray-700 mb-4">Product Description</p>
+        <p id="modalPrice" class="text-xl font-semibold text-blue-700 mb-4">Price: $999</p>
+        <p id="imageSize" class="text-sm text-gray-500 italic"></p>
+      </div>
+      <button onclick="closeModal()" class="self-end mt-6 bg-red-600 text-white px-4 py-2 rounded">Close ✕</button>
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- JS for Modal -->
+  <script>
+  function openModal(imageSrc, name, description, price) {
+    document.getElementById("modalImage").src = imageSrc;
+    document.getElementById("modalTitle").textContent = name;
+    document.getElementById("modalDescription").textContent = description;
+    document.getElementById("modalPrice").textContent = `Price: $${price}`;
+    document.getElementById("imageSize").textContent = ''; // reset size
+    document.getElementById("imageModal").classList.remove("hidden");
+    document.getElementById("imageModal").classList.add("flex");
+  }
+
+  function closeModal() {
+    document.getElementById("imageModal").classList.remove("flex");
+    document.getElementById("imageModal").classList.add("hidden");
+  }
+
+  function showImageSize(img) {
+    const width = img.naturalWidth;
+    const height = img.naturalHeight;
+    document.getElementById("imageSize").textContent = `Image size: ${width} × ${height}px`;
+  }
+</script>
+
+
+</body>
+</html>

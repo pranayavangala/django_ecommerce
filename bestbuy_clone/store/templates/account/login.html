@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Buy Navigation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex justify-center items-center">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-900 p-4 text-white flex items-center w-full fixed top-0">
+        <!-- Clickable Best Buy Logo -->
+        <a href="/" class="text-2xl font-bold">Best Buy</a>
+
+
+        <!-- Search Input (Centered) -->
+        <div class="flex-grow flex justify-center">
+        </div>
+
+        <!-- Cart and Account Icons -->
+        <div class="space-x-4 flex items-center">
+            <a href="/account" class="text-white">Account</a>
+
+
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="login-container bg-white p-6 rounded-lg shadow-md w-96">
+        <h2 class="text-2xl font-bold text-center mb-4">Login</h2>
+        {% if error %}
+            <p class="text-red-500 text-center mb-4">{{ error }}</p>
+        {% endif %}
+        <form method="POST" class="space-y-4"action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username" required class="w-full px-4 py-2 border rounded-md">
+            <input type="password" name="password" placeholder="Password" required class="w-full px-4 py-2 border rounded-md">
+            <button type="submit" class="w-full bg-blue-900 text-white py-2 rounded-md">Login</button>
+        </form>
+        <p class="text-center mt-4">Don't have an account? <a href="{% url 'register' %}" class="text-blue-500">Register here</a></p>
+    </div>
+
+    <!-- JavaScript for Dropdown -->
+    <script>
+        document.getElementById("menu-btn").addEventListener("click", function () {
+            let dropdown = document.getElementById("dropdown-menu");
+            dropdown.classList.toggle("hidden");
+        });
+
+        // Close dropdown if clicked outside
+        document.addEventListener("click", function (event) {
+            let dropdown = document.getElementById("dropdown-menu");
+            let button = document.getElementById("menu-btn");
+            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                dropdown.classList.add("hidden");
+            }
+        });
+    </script>
+</body>
+</html>

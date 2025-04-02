@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Best Buy Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-900 p-4 text-white flex justify-between items-center">
+        <div class="text-2xl font-bold">Best Buy</div>
+        <a href="{% url 'home' %}" class="hover:underline">Home</a>
+        <a href="{% url 'account' %}" class="hover:underline">Account</a>
+        <a href="{% url 'cart' %}" class="hover:underline font-semibold">Cart</a>
+    </nav>
+
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">Your Shopping Cart</h1>
+
+    {% if cart_items %}
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="border-b">
+                    <th class="p-2">Product</th>
+                    <th class="p-2">Price</th>
+                    <th class="p-2">Quantity</th>
+                    <th class="p-2">Total</th>
+                    <th class="p-2">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr class="border-b">
+                    <td class="p-2 flex items-center">
+                        <img src="{{ item.image }}" alt="Product" class="w-16 h-16 rounded-lg mr-4">
+                        {{ item.name }}
+                    </td>
+                    <td class="p-2">${{ item.price }}</td>
+                    <td class="p-2">
+                        <form method="POST" action="{% url 'update_cart_quantity' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_key" value="{{ item.key }}">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" class="w-16 border p-1" min="1">
+                            <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded ml-2">Update</button>
+                        </form>
+                    </td>
+                    <td class="p-2">${{ item.total_price }}</td>
+                    <td class="p-2">
+                        <form method="POST" action="{% url 'remove_from_cart' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_key" value="{{ item.key }}">
+                            <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-4 text-right text-xl font-semibold">
+            Total: ${{ total_price }}
+        </div>
+        <div class="mt-6 flex justify-end">
+        <a href="{% url 'checkout' %}" class="bg-green-600 text-white px-6 py-2 rounded-lg">
+            Proceed to Checkout
+        </a>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center text-gray-600 text-lg">Your cart is empty.
+        <a href="{% url 'home' %}" class="text-blue-600">Continue shopping</a>.
+    </p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+</body>
+</html>
