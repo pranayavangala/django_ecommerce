@@ -108,10 +108,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # AWS S3 SETTINGS
 # ========================
 
-"""AWS_ACCESS_KEY_ID = 'AKIAVRUVRMXJ324MOBGS'
+AWS_ACCESS_KEY_ID = 'AKIAVRUVRMXJ324MOBGS'
 AWS_SECRET_ACCESS_KEY = 'Y8xgHPvqpC1x5/NzhZ3PMYxFIt54kq2yM38ViI4b'
 AWS_S3_BUCKET_NAME = 'product999'
-AWS_REGION = 'us-east-1'  # or your actual region"""
+AWS_REGION = 'us-east-1'
+AWS_S3_CSV_KEY = 'flowers1/'# or your actual region"""
 
 
 # Internationalization

@@ -1,7 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-
 from .models import Product, Category, RegisteredUser
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -13,8 +12,7 @@ from django.contrib.auth.hashers import check_password
 import boto3
 import csv
 import io
-from django.conf import settings
-
+from .s3_reader import fetch_products_from_s3
 
 
 def register(request):
@@ -55,51 +53,60 @@ def user_login(request):
 ########################### User Logout
 def user_logout(request):
     logout(request)
-    return redirect('login')
+    return render(request, "account/logout.html")
 
-
-
-def search_results(request):
+"""def search_results(request):
     query = request.GET.get('q', '').strip().lower()
     products = []
     error_message = None
 
-    if query:
-        try:
-            s3 = boto3.client(
-                's3',
-                aws_access_key_id='AKIAVRUVRMXJ324MOBGS',
-                aws_secret_access_key='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',
-                region_name='us-east-1'
-            )
-            obj = s3.get_object(Bucket='product999', Key='products11.csv')
-            csv_data = obj['Body'].read().decode('utf-8')
-            reader = csv.DictReader(io.StringIO(csv_data))
-
-            for row in reader:
-                if query in row['name'].lower():
-                    products.append(row)
-
+    try:
+        all_products = fetch_products_from_s3()  # Get products from S3 + metadata
+        if query:
+            products = [
+                product for product in all_products
+                if query in product['name'].lower()
+            ]
             if not products:
                 error_message = "Product not available"
+        else:
+            error_message = "Please enter a search term."
+    except Exception as e:
+        error_message = f"Error fetching data: {str(e)}"
 
-        except Exception as e:
-            error_message = f"Error fetching data: {str(e)}"
+    return render(request, 'store/product_list.html', {
+        'products': products,
+        'query': query,
+        'error_message': error_message
+    })"""
+
+def search_results(request):
+    query = request.GET.get('q', '').strip().lower()
+    products = []
+    error_message = "Item not avalibale" # Don't set the message unless needed
+
+    if query:
+        all_products = fetch_products_from_s3()  # Your S3 product source
+        products = [p for p in all_products if query in p['name'].lower()]
+
+        if not products:
+            error_message = f"No products found for '{query}' 💔"
 
     return render(request, 'store/search_results.html', {
         'products': products,
         'query': query,
         'error_message': error_message
     })
-
-
 def home_view(request):
-    return render(request, 'store/home.html')
+    product_images = fetch_products_from_s3()
+    return render(request, 'store/home.html', {'product_images': product_images})
 
 def account_page(request):
     return render(request, 'account/account.html')
 
-
+def about_view(request):
+    return render(request,"account/about.html")
+@csrf_exempt
 def add_to_cart(request):
     if request.method == "POST":
         name = request.POST.get('product_name')
@@ -107,53 +114,75 @@ def add_to_cart(request):
         image = request.POST.get('product_image')
         description = request.POST.get('product_description')
 
-        # Create a unique key using name+price
-        key = f"{name}-{price}"
-
         cart = request.session.get('cart', {})
 
+        key = f"{name}-{price}"  # or any unique ID
         if key in cart:
             cart[key]['quantity'] += 1
         else:
             cart[key] = {
                 'name': name,
-                'price': price,
+                'price': float(price),
                 'image': image,
                 'description': description,
-                'quantity': 1
+                'quantity': 1,
+                'key': key,
             }
 
         request.session['cart'] = cart
+
         return redirect('cart')
 
 
 def cart_view(request):
     cart = request.session.get('cart', {})
-    cart_items = list(cart.values())  # Get product info directly
+    cart_items = []
+    total_price = 0
 
-    return render(request, 'store/cart.html', {'cart_items': cart_items})
+    for key, item in cart.items():
+        if item['quantity'] > 0:  # ✅ Only show non-zero items
+            item_total = float(item['price']) * item['quantity']
+            item['total_price'] = f"{item_total:.2f}"
+            item['key'] = key
+            cart_items.append(item)
+            total_price += item_total
+
+    return render(request, 'store/cart.html', {
+        'cart_items': cart_items,
+        'total_price': f"{total_price:.2f}"
+    })
 
 @csrf_exempt
 def remove_from_cart(request):
     if request.method == "POST":
         key = request.POST.get('item_key')
         cart = request.session.get('cart', {})
-        if key in cart:
-            del cart[key]
+
+        if key and key in cart:
+            cart[key]['quantity'] = 0
             request.session['cart'] = cart
+
     return redirect('cart')
+
 
 @csrf_exempt
 def update_cart_quantity(request):
     if request.method == "POST":
         key = request.POST.get('item_key')
-        quantity = int(request.POST.get('quantity'))
+        try:
+            quantity = int(request.POST.get('quantity'))
+            if quantity < 1:
+                quantity = 1
+        except (TypeError, ValueError):
+            quantity = 1
+
         cart = request.session.get('cart', {})
-        if key in cart:
+
+        if key and key in cart:
             cart[key]['quantity'] = quantity
             request.session['cart'] = cart
-    return redirect('cart')
 
+    return redirect('cart')
 
 def checkout_view(request):
     return render(request, 'store/checkout.html')
@@ -166,8 +195,9 @@ def purchases(request):
 def product_list(request):
     categories = Category.objects.all()
     products = Product.objects.all()
-    return render(request, 'product_list', {'categories': categories, 'products': products})
-
+    return render(request, 'store/product_list.html', {
+        'products': products,
+    })
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     return render(request, 'product_detail.html', {'product': product})
@@ -176,8 +206,6 @@ def category_products(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
     products = Product.objects.filter(category=category)
     return render(request, 'category_products.html', {'category': category, 'products': products})
-
-
 
 
 

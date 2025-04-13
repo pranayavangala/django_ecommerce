@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - Bloom Basket</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 text-gray-800 font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-green-800 text-white p-4 flex justify-between items-center shadow">
+    <a href="{% url 'home' %}" class="text-2xl font-bold">🌷 Bloom Basket</a>
+    <div class="space-x-4">
+      <a href="{% url 'account' %}" class="hover:underline">Account</a>
+      <a href="{% url 'about' %}" class="hover:underline font-semibold">About Us</a>
+      <a href="{% url 'cart' %}" class="hover:underline">Cart</a>
+      <a href="{% url 'logout' %}" class="hover:underline">Logout</a>
+    </div>
+  </nav>
+
+  <!-- About Section -->
+  <section class="max-w-5xl mx-auto p-10 mt-10 bg-white rounded-lg shadow-md">
+    <h1 class="text-4xl font-bold text-green-900 mb-6 text-center">About Us</h1>
+    <p class="text-lg leading-8 text-gray-700">
+      Welcome to <strong>Bloom Basket</strong> 🌸 – your trusted online destination for fresh flowers, potted plants, and garden essentials.
+    </p>
+
+    <p class="mt-4 text-gray-700">
+      🌿 Founded with love for nature, we are passionate about helping people bring life and beauty into their homes and gardens. Whether you're gifting a bouquet, decorating your home with greenery, or building your dream balcony garden, Bloom Basket is here to make it bloom beautifully.
+    </p>
+
+    <p class="mt-4 text-gray-700">
+      💚 Our curated collections include seasonal flowers, aromatic herbs, succulents, and more. Every product is selected with care, packed sustainably, and delivered fresh from our gardens to your doorstep.
+    </p>
+
+    <p class="mt-4 text-gray-700">
+      ✨ With a focus on quality, sustainability, and personalized service, we’re here to grow with you—one bloom at a time.
+    </p>
+
+    <p class="mt-6 text-green-700 text-xl font-semibold">
+      Thank you for making your world greener with Bloom Basket 🌼
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center mt-10 p-4 text-sm text-gray-500">
+    © 2025 Bloom Basket. All rights reserved.
+  </footer>
+
+</body>
+</html>

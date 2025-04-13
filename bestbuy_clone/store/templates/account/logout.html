@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Logout</title>
+  <meta charset="UTF-8" />
+  <title>Logged Out - Bloom Basket</title>
+  {% load static %}
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
+<body class="bg-green-50 min-h-screen flex flex-col justify-center items-center text-center text-gray-800">
+
+  <!-- 🌿 Header -->
+  <h1 class="text-4xl font-bold text-green-800 mb-4">You’ve been logged out 🌸</h1>
+
+  <!-- 🌼 Message -->
+  <p class="text-lg mb-6">Thank you for visiting <span class="font-semibold text-green-700">Bloom Basket</span> 🌿</p>
+  <p class="text-md text-gray-600 italic mb-10">"Where every bloom brings joy — visit again soon!"</p>
+
+  <!-- 🌱 Call to action -->
+  <a href="{% url 'login' %}" class="bg-green-700 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition">
+    ⬅ Back to Login
+  </a>
 </body>
 </html>

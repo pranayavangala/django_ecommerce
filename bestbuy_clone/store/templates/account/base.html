@@ -1,5 +1,35 @@
-{% if user.is_authenticated %}
-    <p>Welcome, {{ user.username }} | <a href="{% url 'logout' %}">Logout</a></p>
-{% else %}
-    <a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}Bloom Basket{% endblock %}</title>
+  {% load static %}
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-green-50 font-sans min-h-screen">
+
+  <!-- 🌿 Navigation -->
+  <nav class="bg-green-800 text-white p-4 flex justify-between items-center shadow-md">
+    <a href="{% url 'home' %}" class="text-2xl font-bold">🌷 Bloom Basket</a>
+
+    <!-- 🔐 Auth Links -->
+    <div class="space-x-4">
+      {% if user.is_authenticated %}
+        <span>Welcome, {{ user.username }}</span>
+        <a href="{% url 'logout' %}" class="hover:underline">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="hover:underline">Login</a>
+        <a href="{% url 'register' %}" class="hover:underline">Register</a>
+      {% endif %}
+      <a href="{% url 'cart' %}" class="hover:underline">Cart</a>
+    </div>
+  </nav>
+
+  <!-- 📦 Page Content -->
+  <main class="mt-6 px-4">
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>
